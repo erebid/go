@@ -203,6 +203,11 @@ func runSetup(id int) {
 func runBackground(id int) {
 	buf := make([]byte, 4096)
 	run.Lock()
+	root := os.Getenv("PLAN9")
+	if root == "" {
+		root = "/usr/local/plan9"
+	}
+	rc := root + "/bin/rc"
 	for {
 		if id != run.id || run.kill {
 			run.Unlock()
@@ -234,7 +239,7 @@ func runBackground(id int) {
 		run.Unlock()
 
 		line := data[1:] // chop %
-		cmd := exec.Command("/usr/local/plan9/bin/rc", "-c", string(line))
+		cmd := exec.Command(rc, "-c", string(line))
 		r, w, err := os.Pipe()
 		if err != nil {
 			log.Fatal(err)
